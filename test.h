@@ -53,7 +53,13 @@ extern "C" {
 #endif
 
 
-extern GoInt GoAdd(GoFloat64 p0, GoFloat64 p1);
+/* Return type for Formula_calculation */
+struct Formula_calculation_return {
+	GoFloat64 r0;
+	GoFloat64 r1;
+};
+
+extern struct Formula_calculation_return Formula_calculation(GoFloat64 p0, GoFloat64 p1, GoFloat64 p2);
 
 #ifdef __cplusplus
 }
