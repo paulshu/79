@@ -1,11 +1,9 @@
 package main
 
 import (
-	"C"
+	"fmt"
 	"math"
-)
-import (
-	"strconv"
+	"time"
 )
 
 func Round(f float64, n int) float64 {
@@ -14,7 +12,6 @@ func Round(f float64, n int) float64 {
 }
 
 // 按n位四舍五入
-
 func Rounddown(f float64, n int) float64 {
 	pow10_n := math.Pow10(n)
 	return math.Trunc(f*pow10_n) / pow10_n
@@ -23,7 +20,7 @@ func Rounddown(f float64, n int) float64 {
 // 去掉n位后的尾数
 func ExtremumInArray(array []float64) (float64, float64) {
 	if len(array) < 1 {
-		return 0.0, 0.0
+		return 0, 0
 	}
 	min := array[0]
 	max := array[0]
@@ -39,58 +36,57 @@ func ExtremumInArray(array []float64) (float64, float64) {
 
 // 求数组的最大值和最小值
 
-//export Formula_calculation
-func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hinge_x, hinge_z, open_angle, door_weight, climbing_degree,
-	b_x, b_y, b_z, open_time, snow_load, platform_spring_static_length, platform_s_elastic_modulus, platform_inside_diameter, platform_lead,
-	platform_gear_transmission_ratio, platform_rated_speed, flocking, free_length_filter, open_angle_filter,
-	open_dynamic_friction, close_dynamic_friction, open_static_friction, close_static_friction float64) *C.char {
-	var vector_og_on_xz, vector_ob_on_xz, vector_ob_on_xz_x_angle, vector_og_on_xz_x_angle, o_centre_gravity_x, o_gate_b1_x, o_gate_b1_z float64
-	var vector_ob1_length_x, vector_ob1_length_z, vector_ab1_length_x, vector_ab1_length_y, vector_ab1_length_z, vector_ab_length_x, vector_ab_length_y, vector_ab_length_z, vector_ab1_ob1_on_xz_angle, od_length, cd_length, car_climbing_angle, vector_ob_slope, vector_ab_slope, vector_ob_ab_angle float64
-	var vector_ab_xz_angle, vector_ab1_xz_angle, od_pole_force_arm, cd_pole_force_arm, od_min_force, cd_max_force, spring_cd_length, spring_od_length, initial_mean_diameter, wire_diameter_d, mean_diameter float64
-	var no_solid_position_active_coil_num, active_coil_num, spring_rate, theoretical_free_length, free_length, spring_pitch, spring_helix_angle float64
+var vector_og_on_xz, vector_ob_on_xz, vector_ab, vector_ob_on_xz_x_angle, vector_og_on_xz_x_angle, o_centre_gravity_x, o_centre_gravity_z, o_gate_b1_x, o_gate_b1_z float64
+var vector_ob1_length_x, vector_ob1_length_y, vector_ob1_length_z, vector_ab1_length_x, vector_ab1_length_y, vector_ab1_length_z, vector_ab_length_x, vector_ab_length_y, vector_ab_length_z, vector_ab1_ob1_on_xz_angle, od_length, cd_length, working_stroke, car_climbing_angle, vector_ob_slope, vector_ab_slope, vector_ob_ab_angle float64
+var vector_ab_xz_angle, vector_ab1_xz_angle, od_pole_force_arm, cd_pole_force_arm, od_min_force, cd_max_force, spring_cd_length, spring_od_length, deformation, max_test_shear_stress, dynamic_load_allowable_shear_stress, initial_mean_diameter, spring_theoretical_rate, theoretical_wire_diameter, wire_diameter_d, mean_diameter float64
+var theoretical_active_coil_num, no_solid_position_active_coil_num, active_coil_num, spring_rate, ht_spring_rate, theoretical_free_length, free_length, spring_pitch, spring_helix_angle, total_num, spring_od_force, spring_cd_force float64
 
-	var open_angle_arr_pre, open_angle_arr, o_gate_b_x_arr, o_gate_b_y_arr, o_gate_b_z_arr, pole_length_arr, motor_output_speed_arr, motor_pwm_arr, vector_ba_length_x_arr, vector_ba_length_z_arr, vector_ob_length_x_arr, vector_ob_length_z_arr, vector_ba_ob_on_xz_angle_arr, pole_force_arm_arr, vector_ab_xz_angle_arr []float64
-	var uphill_gravity_arm_arr, flat_slope_gravity_arm_arr, downhill_gravity_arm_arr, uphill_gravity_torque_arr, flat_slope_gravity_torque_arr, downhill_gravity_torque_arr, uphill_gravity_torque_snow_arr, flat_slope_gravity_torque_snow_arr, downhill_gravity_torque_snow_arr, nt_spring_force_arr, nt_lower_deviation_spring_force_arr []float64
-	var nt_upper_deviation_spring_force_arr, nt_after_life_spring_force_arr, nt_lower_deviation_spring_torque_arr, nt_median_spring_torque_arr, double_nt_median_spring_torque_arr, nt_upper_deviation_spring_torque_arr, nt_after_life_spring_torque_arr, ht_lower_deviation_spring_torque_arr, ht_median_spring_torque_arr, ht_upper_deviation_spring_torque_arr []float64
-	var ht_after_life_spring_torque_arr, nt_open_dynamic_friction_arr, lt_open_dynamic_friction_arr, ht_open_dynamic_friction_arr, nt_close_dynamic_friction_arr, lt_close_dynamic_friction_arr, ht_close_dynamic_friction_arr, nt_open_static_friction_arr, lt_open_static_friction_arr, ht_open_static_friction_arr, nt_close_static_friction_arr, lt_close_static_friction_arr, ht_close_static_friction_arr []float64
-	var uphill_ht_lower_deviation_hover_arr, uphill_ht_median_hover_arr, uphill_ht_upper_deviation_hover_arr, uphill_ht_after_life_hover_arr, flat_slope_ht_lower_deviation_hover_arr, flat_slope_ht_median_hover_arr, flat_slope_ht_upper_deviation_hover_arr, flat_slope_ht_after_life_hover_arr, downhill_ht_lower_deviation_hover_arr, downhill_ht_median_hover_arr, downhill_ht_upper_deviation_hover_arr, downhill_ht_after_life_hover_arr []float64
+var open_angle_arr_pre, open_angle_arr, o_gate_b_x_arr, o_gate_b_y_arr, o_gate_b_z_arr, pole_length_arr, motor_output_speed_arr, motor_pwm_arr, vector_ba_length_x_arr, vector_ba_length_z_arr, vector_ob_length_x_arr, vector_ob_length_z_arr, vector_ba_ob_on_xz_angle_arr, pole_force_arm_arr, vector_ab_xz_angle_arr []float64
+var uphill_gravity_arm_arr, flat_slope_gravity_arm_arr, downhill_gravity_arm_arr, uphill_gravity_torque_arr, flat_slope_gravity_torque_arr, downhill_gravity_torque_arr, uphill_gravity_torque_snow_arr, flat_slope_gravity_torque_snow_arr, downhill_gravity_torque_snow_arr, nt_spring_force_arr, nt_lower_deviation_spring_force_arr []float64
+var nt_upper_deviation_spring_force_arr, nt_after_life_spring_force_arr, nt_lower_deviation_spring_torque_arr, nt_median_spring_torque_arr, double_nt_median_spring_torque_arr, nt_upper_deviation_spring_torque_arr, nt_after_life_spring_torque_arr, ht_lower_deviation_spring_torque_arr, ht_median_spring_torque_arr, ht_upper_deviation_spring_torque_arr []float64
+var ht_after_life_spring_torque_arr, nt_open_dynamic_friction_arr, lt_open_dynamic_friction_arr, ht_open_dynamic_friction_arr, nt_close_dynamic_friction_arr, lt_close_dynamic_friction_arr, ht_close_dynamic_friction_arr, nt_open_static_friction_arr, lt_open_static_friction_arr, ht_open_static_friction_arr, nt_close_static_friction_arr, lt_close_static_friction_arr, ht_close_static_friction_arr []float64
+var uphill_ht_lower_deviation_hover_arr, uphill_ht_median_hover_arr, uphill_ht_upper_deviation_hover_arr, uphill_ht_after_life_hover_arr, flat_slope_ht_lower_deviation_hover_arr, flat_slope_ht_median_hover_arr, flat_slope_ht_upper_deviation_hover_arr, flat_slope_ht_after_life_hover_arr, downhill_ht_lower_deviation_hover_arr, downhill_ht_median_hover_arr, downhill_ht_upper_deviation_hover_arr, downhill_ht_after_life_hover_arr []float64
 
-	const PI = 3.141592653589793
-	const Initial_wire_diameter = 3.6 // 弹簧初选线径
-	var k, c, f1, f2, min, max float64
+const PI = 3.141592653589793
+const Initial_wire_diameter = 3.6 // 弹簧初选线径
+
+func Formula_calculation(a_x, a_y, a_z float64) (float64, float64) {
+	var k, c, f1, f2 float64
 	var oa, oaf int
-	// centre_gravity_x := 3850.0
-	// centre_gravity_z := 853.576
-	// hinge_x := 3470.5
-	// hinge_z := 1240.0
-	// open_angle := 89.0
-	// door_weight := 32.31
-	// climbing_degree := 0.2
-	// b_x := 3711.0
-	// b_y := -659.67
-	// b_z := 745.25
-	// open_time := 6.0
-	// snow_load := 5.0
+	centre_gravity_x := 3850.0
+	centre_gravity_z := 853.576
+	hinge_x := 3470.5
+	hinge_y := 0.0
+	hinge_z := 1240.0
+	open_angle := 89.0
+	door_weight := 32.31
+	climbing_degree := 0.2
+	b_x := 3711.0
+	b_y := -659.67
+	b_z := 745.25
+	open_time := 6.0
+	snow_load := 5.0
 
-	// platform_spring_static_length := 224.1
-	// platform_s_elastic_modulus := 78800.0
-	// platform_inside_diameter := 21.55
-	// platform_lead := 12.5
-	// platform_gear_transmission_ratio := 22.2
-	// platform_rated_speed := 7500.0
-	// flocking := 0.4
-	// free_length_filter := 1.0
-	// open_angle_filter := 0
-	// open_dynamic_friction := 250.0
-	// close_dynamic_friction := -270.0
-	// open_static_friction := 300.0
-	// close_static_friction := -320.0
+	platform_spring_static_length := 224.1
+	platform_max_tensile_strength := 2100.0
+	platform_s_elastic_modulus := 78800.0
+	platform_inside_diameter := 21.55
+	platform_lead := 12.5
+	platform_gear_transmission_ratio := 22.2
+	platform_rated_speed := 7500.0
+	flocking := 0.4
+	free_length_filter := 1.0
+	open_angle_filter := 0
+	open_dynamic_friction := 250.0
+	close_dynamic_friction := -270.0
+	open_static_friction := 300.0
+	close_static_friction := -320.0
 
 	vector_og_on_xz = math.Sqrt((centre_gravity_x-hinge_x)*(centre_gravity_x-hinge_x) + (centre_gravity_z-hinge_z)*(centre_gravity_z-hinge_z))
 	// 向量OG在XZ平面的投影长度
 	vector_ob_on_xz = math.Sqrt(math.Pow((b_x-hinge_x), 2) + math.Pow((b_z-hinge_z), 2))
 	// 向量OB在XZ平面的投影长度
-	// vector_ab = math.Sqrt((a_x-b_x)*(a_x-b_x) + (a_y-b_y)*(a_y-b_y) + (a_z-b_z)*(a_z-b_z))
+	vector_ab = math.Sqrt((a_x-b_x)*(a_x-b_x) + (a_y-b_y)*(a_y-b_y) + (a_z-b_z)*(a_z-b_z))
 	// 向量AB的长度,即撑杆关门长度
 	vector_ob_on_xz_x_angle = (180 / PI) * math.Atan((b_z-hinge_z)/(b_x-hinge_x))
 	// 向量OB在XZ平面与X轴的夹角（°）
@@ -98,7 +94,7 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 	// 向量OG在XZ平面与X轴的夹角（°）
 	o_centre_gravity_x = vector_og_on_xz*math.Cos((open_angle-math.Abs(vector_og_on_xz_x_angle))*PI/180) + hinge_x
 	// 开门重心X坐标
-	// o_centre_gravity_z = vector_og_on_xz*math.Sin((open_angle-math.Abs(vector_og_on_xz_x_angle))*PI/180) + hinge_z
+	o_centre_gravity_z = vector_og_on_xz*math.Sin((open_angle-math.Abs(vector_og_on_xz_x_angle))*PI/180) + hinge_z
 	// 开门重心z坐标
 
 	o_gate_b1_x = vector_ob_on_xz*math.Cos((open_angle-math.Abs(vector_ob_on_xz_x_angle))*PI/180) + hinge_x
@@ -108,7 +104,7 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 	vector_ob1_length_x = o_gate_b1_x - hinge_x
 	// 向量OB1的长度（X方向分量）
 
-	// vector_ob1_length_y = math.Abs(b_y - hinge_y)
+	vector_ob1_length_y = math.Abs(b_y - hinge_y)
 	// 向量OB1的长度（Y方向分量）
 	vector_ob1_length_z = o_gate_b1_z - hinge_z
 	// 向量OB1的长度（Z方向分量）
@@ -134,7 +130,7 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 	// 撑杆开门长度
 	cd_length = math.Sqrt(math.Pow((b_x-a_x), 2) + math.Pow((b_y-a_y), 2) + math.Pow((b_z-a_z), 2))
 	// 撑杆关门长度
-	// working_stroke = od_length - cd_length                     // 撑杆工作行程
+	working_stroke = od_length - cd_length                     // 撑杆工作行程
 	car_climbing_angle = math.Atan(climbing_degree) * 180 / PI // 汽车爬坡角度
 
 	vector_ob_slope = (b_z - hinge_z) / (b_x - hinge_x) // 向量ob的斜率
@@ -160,16 +156,16 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 
 	spring_cd_length = cd_length - platform_spring_static_length
 	spring_od_length = od_length - platform_spring_static_length
-	// deformation = spring_od_length - spring_cd_length
-	// max_test_shear_stress = platform_max_tensile_strength * 0.6                // 最大试验切应用力
-	// dynamic_load_allowable_shear_stress = platform_max_tensile_strength * 0.57 // 动负荷许用切应力
-	initial_mean_diameter = platform_inside_diameter + Initial_wire_diameter // 弹簧初选中径
-	// spring_theoretical_rate = (cd_max_force - od_min_force) / deformation    // 理论刚度
+	deformation = spring_od_length - spring_cd_length
+	max_test_shear_stress = platform_max_tensile_strength * 0.6                // 最大试验切应用力
+	dynamic_load_allowable_shear_stress = platform_max_tensile_strength * 0.57 // 动负荷许用切应力
+	initial_mean_diameter = platform_inside_diameter + Initial_wire_diameter   // 弹簧初选中径
+	spring_theoretical_rate = (cd_max_force - od_min_force) / deformation      // 理论刚度
 
 	// 理论线径
 	c = initial_mean_diameter / Initial_wire_diameter
 	k = (4*c-1)/(4*c-4) + (0.615 / c)
-	// theoretical_wire_diameter = math.Cbrt(8 * k * initial_mean_diameter * cd_max_force / (PI * dynamic_load_allowable_shear_stress))
+	theoretical_wire_diameter = math.Cbrt(8 * k * initial_mean_diameter * cd_max_force / (PI * dynamic_load_allowable_shear_stress))
 	// 弹簧线径
 	wire_diameter_d = Round(math.Cbrt((8*k*initial_mean_diameter*cd_max_force)/(PI*1470)), 1)
 	// 其中1470为现在与供应商确定的最大工作切应力
@@ -185,7 +181,7 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 	mean_diameter = platform_inside_diameter + wire_diameter_d
 
 	// 理论有效圈数
-	// theoretical_active_coil_num = platform_s_elastic_modulus * math.Pow(wire_diameter_d, 4) / (8 * math.Pow(mean_diameter, 3) * spring_theoretical_rate)
+	theoretical_active_coil_num = platform_s_elastic_modulus * math.Pow(wire_diameter_d, 4) / (8 * math.Pow(mean_diameter, 3) * spring_theoretical_rate)
 
 	// 不压并建议有效圈数
 	no_solid_position_active_coil_num = (spring_cd_length-13)/(wire_diameter_d+flocking) - 2
@@ -196,7 +192,7 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 	spring_rate = platform_s_elastic_modulus * math.Pow(wire_diameter_d, 4) / (8 * math.Pow(mean_diameter, 3) * active_coil_num)
 
 	// 高温弹簧刚度
-	// ht_spring_rate = spring_rate * 0.96
+	ht_spring_rate = spring_rate * 0.96
 
 	// 理论自由长度
 
@@ -217,7 +213,7 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 		mean_diameter = platform_inside_diameter + wire_diameter_d
 
 		// 理论有效圈数
-		// theoretical_active_coil_num = platform_s_elastic_modulus * math.Pow(wire_diameter_d, 4) / (8 * math.Pow(mean_diameter, 3) * spring_theoretical_rate)
+		theoretical_active_coil_num = platform_s_elastic_modulus * math.Pow(wire_diameter_d, 4) / (8 * math.Pow(mean_diameter, 3) * spring_theoretical_rate)
 
 		// 不压并建议有效圈数
 		no_solid_position_active_coil_num = (spring_cd_length-13)/(wire_diameter_d+flocking) - 2
@@ -228,7 +224,7 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 		spring_rate = platform_s_elastic_modulus * math.Pow(wire_diameter_d, 4) / (8 * math.Pow(mean_diameter, 3) * active_coil_num)
 
 		// 高温弹簧刚度
-		// ht_spring_rate = spring_rate * 0.96
+		ht_spring_rate = spring_rate * 0.96
 
 		// 理论自由长度
 
@@ -240,10 +236,10 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 	}
 
 	// 弹簧总圈数
-	// total_num = active_coil_num + 2
+	total_num = active_coil_num + 2
 
-	// spring_od_force = Round((free_length-spring_od_length)*spring_rate, 3)
-	// spring_cd_force = Round((free_length-spring_cd_length)*spring_rate, 3)
+	spring_od_force = Round((free_length-spring_od_length)*spring_rate, 3)
+	spring_cd_force = Round((free_length-spring_cd_length)*spring_rate, 3)
 
 	// 撑杆中间参数计算 //
 
@@ -253,7 +249,7 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 	} else {
 		oa = int(open_angle)/2 + 2
 	}
-	oaf = int(open_angle_filter) / 2
+	oaf = open_angle_filter / 2
 
 	//开门角度增量
 
@@ -570,38 +566,38 @@ func Formula_calculation(a_x, a_y, a_z, centre_gravity_x, centre_gravity_z, hing
 		downhill_ht_after_life_hover_arr = append(downhill_ht_after_life_hover_arr, (ht_after_life_spring_torque_arr[i]-v/2)/pole_force_arm_arr[i]/math.Cos(PI/180*vector_ab_xz_angle_arr[i])*1000)
 	}
 
+	// temp := []float64{200, 300}
+	//
+	// if cd_max_force > od_min_force {
+	// 	return (flat_slope_nt_median_manually_open_door_arr + flat_slope_nt_median_manually_close_door_arr)
+	// } else {
+	// 	return temp
+	// }
 	var abcd []float64
 	for i, v := range uphill_ht_lower_deviation_hover_arr {
 		abcd = append(abcd, v, uphill_ht_median_hover_arr[i], uphill_ht_upper_deviation_hover_arr[i], uphill_ht_after_life_hover_arr[i], flat_slope_ht_lower_deviation_hover_arr[i], flat_slope_ht_median_hover_arr[i], flat_slope_ht_upper_deviation_hover_arr[i], flat_slope_ht_after_life_hover_arr[i], downhill_ht_lower_deviation_hover_arr[i], downhill_ht_median_hover_arr[i], downhill_ht_upper_deviation_hover_arr[i], downhill_ht_after_life_hover_arr[i])
 	}
-	if cd_max_force > od_min_force {
-		min, max = ExtremumInArray(abcd)
-	} else {
-		min, max = -600.45672, 600.76432
-	}
-
+	min, max := ExtremumInArray(abcd)
 	// var result int
 	// if min >= (close_static_friction+50) && max <= (open_static_friction-50) {
 	// 	result = 1
 	// } else {
 	// 	result = 0
 	// }
-	// return result
-	var aa, cc string
-	aa = strconv.FormatFloat(Round(min, 5), 'f', -1, 64)
-	cc = strconv.FormatFloat(Round(max, 5), 'f', -1, 64)
-	result := aa + "," + cc
 
-	return C.CString(result)
+	return min, max
 }
 
-func main() {}
+func main() {
+	bodax := []float64{3465.0, 3459.89107225708, 3460.39430290314, 3469.96843653133}
+	boday := []float64{-575.25, -582.946960168526, -582.101657439355, -581.313600104464}
+	bodaz := []float64{1134.5, 1110.52734375, 1120.67224121094, 1130.86755371094}
+	for i, v := range bodax {
+		fmt.Println(Formula_calculation(v, boday[i], bodaz[i]))
+		time.Sleep(1 * time.Second)
+	}
 
-// 	bodax := []float64{3459.89107225708, 3460.39430290314, 3469.96843653133, 3465.0}
-// 	boday := []float64{-582.946960168526, -582.101657439355, -581.313600104464, -575.25}
-// 	bodaz := []float64{1110.52734375, 1120.67224121094, 1130.86755371094, 1134.5}
-// 	for i, v := range bodax {
-// 		fmt.Println(Formula_calculation(v, boday[i], bodaz[i]))
-// 		time.Sleep(1 * time.Second)
-// 	}
-// }
+	// fmt.Println(Formula_calculation(3465.0, -575.0, 1134.5))
+	// fmt.Printf("vector_ob_on_xz_x_angle= %v vector_ab= %v \n",
+	// 	vector_og_on_xz, vector_ab)
+}

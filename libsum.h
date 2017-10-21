@@ -55,6 +55,14 @@ extern "C" {
 
 extern GoInt GoAdd(GoFloat64 p0, GoFloat64 p1);
 
+extern GoInt Add(GoInt p0, GoInt p1);
+
+extern GoFloat64 Cosine(GoFloat64 p0);
+
+extern char* Sort(GoFloat64 p0, GoFloat64 p1, GoFloat64 p2);
+
+extern void Log(GoString p0);
+
 #ifdef __cplusplus
 }
 #endif
